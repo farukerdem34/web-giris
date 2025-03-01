@@ -24,8 +24,8 @@ pub async fn create_reservation(
     .await;
 
     match result {
-        Ok(record) => HttpResponse::Created().json(record),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Ok(_record) => HttpResponse::Created(),
+        Err(_) => HttpResponse::InternalServerError(),
     }
 }
 
@@ -76,8 +76,8 @@ pub async fn update_reservation(
     .await;
 
     match result {
-        Ok(updated_reservation) => HttpResponse::Ok().json(updated_reservation),
-        Err(_) => HttpResponse::NotFound().finish(),
+        Ok(_updated_reservation) => HttpResponse::Ok(),
+        Err(_) => HttpResponse::NotFound(),
     }
 }
 
@@ -114,8 +114,8 @@ pub async fn create_event(
     .await;
 
     match result {
-        Ok(record) => HttpResponse::Created().json(record),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Ok(_record) => HttpResponse::Created(),
+        Err(_) => HttpResponse::InternalServerError(),
     }
 }
 
@@ -162,8 +162,8 @@ pub async fn update_event(
     .await;
 
     match result {
-        Ok(updated_event) => HttpResponse::Ok().json(updated_event),
-        Err(_) => HttpResponse::NotFound().finish(),
+        Ok(_updated_event) => HttpResponse::Ok(),
+        Err(_) => HttpResponse::NotFound(),
     }
 }
 
@@ -198,8 +198,8 @@ pub async fn create_ticket(
     .await;
 
     match result {
-        Ok(record) => HttpResponse::Created().json(record),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Ok(_record) => HttpResponse::Created(),
+        Err(_) => HttpResponse::InternalServerError(),
     }
 }
 
@@ -246,8 +246,8 @@ pub async fn update_ticket(
     .await;
 
     match result {
-        Ok(updated_ticket) => HttpResponse::Ok().json(updated_ticket),
-        Err(_) => HttpResponse::NotFound().finish(),
+        Ok(_updated_ticket) => HttpResponse::Ok(),
+        Err(_) => HttpResponse::NotFound(),
     }
 }
 
