@@ -36,7 +36,7 @@ pub async fn create_reservation(
     HttpResponse::Created().json(reservation)
 }
 
-pub async fn get_reservation(data: web::Data<AppState>) -> impl Responder {
+pub async fn get_reservations(data: web::Data<AppState>) -> impl Responder {
     let result = sqlx::query_as!(Reservation, "SELECT * FROM reservations")
         .fetch_all(&data.pool)
         .await;
