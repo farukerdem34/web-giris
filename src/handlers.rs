@@ -1,39 +1,32 @@
-use crate::models::{Event, Reservation, Ticket};
+use crate::models::{CreateEvent, CreateReservation, CreateTicket, Event, Reservation, Ticket};
 use actix_web::{web, HttpResponse, Responder};
 use sqlx::PgPool;
-
+use uuid::Uuid;
 #[derive(Clone)]
 pub struct AppState {
     pub pool: PgPool,
 }
 
+// Create
 pub async fn create_reservation(
-    state: web::Data<AppState>,
-    reservation: web::Json<Reservation>,
+    data: web::Data<AppState>,
+    reservation: web::Json<CreateReservation>,
 ) -> impl Responder {
-    let mut conn = match state.pool.acquire().await {
-        Ok(conn) => conn,
-        Err(_) => return HttpResponse::InternalServerError().body("Database connection failed"),
-    };
+    let result = sqlx::query!(
+        "INSERT INTO reservations (ticket_id,customer_name,reservation_date,status) VALUES ($1, $2,$3,$4) RETURNING id, ticket_id,customer_name,reservation_date,status",
+        reservation.ticket_id,
+        reservation.customer_name,
+        reservation.reservation_date,
+        reservation.status
 
-    let mut tx = match conn.begin().await {
-        Ok(tx) => tx,
-        Err(_) => return HttpResponse::InternalServerError().body("Transaction start failed"),
-    };
+    )
+    .fetch_one(&data.pool)
+    .await;
 
-    let reservation = match Reservation::create(&mut tx, reservation.into_inner()).await {
-        Ok(res) => res,
-        Err(_) => {
-            let _ = tx.rollback().await;
-            return HttpResponse::InternalServerError().body("Failed to create reservation");
-        }
-    };
-
-    if let Err(_) = tx.commit().await {
-        return HttpResponse::InternalServerError().body("Transaction commit failed");
+    match result {
+        Ok(record) => HttpResponse::Created().json(record),
+        Err(_) => HttpResponse::InternalServerError().finish(),
     }
-
-    HttpResponse::Created().json(reservation)
 }
 
 pub async fn get_reservations(data: web::Data<AppState>) -> impl Responder {
@@ -49,7 +42,7 @@ pub async fn get_reservations(data: web::Data<AppState>) -> impl Responder {
 
 pub async fn get_reservation(
     data: web::Data<AppState>,
-    reservation_id: web::Path<i32>,
+    reservation_id: web::Path<Uuid>,
 ) -> impl Responder {
     let result = sqlx::query_as!(
         Reservation,
@@ -67,14 +60,16 @@ pub async fn get_reservation(
 
 pub async fn update_reservation(
     data: web::Data<AppState>,
-    reservation_id: web::Path<i32>,
-    reservation: web::Json<CreateItem>,
+    reservation_id: web::Path<Uuid>,
+    reservation: web::Json<CreateReservation>,
 ) -> impl Responder {
     let result = sqlx::query!(
-        "UPDATE reservations SET name = $1, date= $2 
-        WHERE id = $3 RETURNING id, name, date",
-        reservation.name,
-        reservation.date,
+        "UPDATE reservations SET ticket_id = $1, customer_name= $2,reservation_date=$3,status=$4 
+        WHERE id = $5 RETURNING id, ticket_id,customer_name,reservation_date,status",
+        reservation.ticket_id,
+        reservation.customer_name,
+        reservation.reservation_date,
+        reservation.status,
         *reservation_id
     )
     .fetch_one(&data.pool)
@@ -88,7 +83,7 @@ pub async fn update_reservation(
 
 pub async fn delete_reservation(
     data: web::Data<AppState>,
-    reservation_id: web::Path<i32>,
+    reservation_id: web::Path<Uuid>,
 ) -> impl Responder {
     let result = sqlx::query!("DELETE FROM reservations WHERE id = $1", *reservation_id)
         .execute(&data.pool)
@@ -104,12 +99,12 @@ pub async fn delete_reservation(
 // Create
 pub async fn create_event(
     data: web::Data<AppState>,
-    event: web::Json<CreateItem>,
+    event: web::Json<CreateEvent>,
 ) -> impl Responder {
     let result = sqlx::query!(
         "INSERT INTO events 
         (name, date,venue)
-        VALUES ($1, $2) 
+        VALUES ($1, $2,$3) 
         RETURNING name, date,venue",
         event.name,
         event.date,
@@ -126,7 +121,7 @@ pub async fn create_event(
 
 // Read
 pub async fn get_events(data: web::Data<AppState>) -> impl Responder {
-    let result = sqlx::query_as!(Item, "SELECT * FROM events")
+    let result = sqlx::query_as!(Event, "SELECT * FROM events")
         .fetch_all(&data.pool)
         .await;
 
@@ -136,8 +131,8 @@ pub async fn get_events(data: web::Data<AppState>) -> impl Responder {
     }
 }
 
-pub async fn get_event(data: web::Data<AppState>, event_id: web::Path<i32>) -> impl Responder {
-    let result = sqlx::query_as!(Item, "SELECT * FROM events WHERE id = $1", *event_id)
+pub async fn get_event(data: web::Data<AppState>, event_id: web::Path<Uuid>) -> impl Responder {
+    let result = sqlx::query_as!(Event, "SELECT * FROM events WHERE id = $1", *event_id)
         .fetch_one(&data.pool)
         .await;
 
@@ -150,8 +145,8 @@ pub async fn get_event(data: web::Data<AppState>, event_id: web::Path<i32>) -> i
 // Update
 pub async fn update_event(
     data: web::Data<AppState>,
-    event_id: web::Path<i32>,
-    event: web::Json<CreateItem>,
+    event_id: web::Path<Uuid>,
+    event: web::Json<CreateEvent>,
 ) -> impl Responder {
     let result = sqlx::query!(
         "UPDATE events 
@@ -173,7 +168,7 @@ pub async fn update_event(
 }
 
 // Delete
-pub async fn delete_event(data: web::Data<AppState>, event_id: web::Path<i32>) -> impl Responder {
+pub async fn delete_event(data: web::Data<AppState>, event_id: web::Path<Uuid>) -> impl Responder {
     let result = sqlx::query!("DELETE FROM events WHERE id = $1", *event_id)
         .execute(&data.pool)
         .await;
@@ -188,7 +183,7 @@ pub async fn delete_event(data: web::Data<AppState>, event_id: web::Path<i32>) -
 // Create
 pub async fn create_ticket(
     data: web::Data<AppState>,
-    ticket: web::Json<CreateItem>,
+    ticket: web::Json<CreateTicket>,
 ) -> impl Responder {
     let result = sqlx::query!(
         "INSERT INTO tickets (event_id, seat_number, price, status) 
@@ -210,7 +205,7 @@ pub async fn create_ticket(
 
 // Read
 pub async fn get_tickets(data: web::Data<AppState>) -> impl Responder {
-    let result = sqlx::query_as!(Item, "SELECT * FROM tickets")
+    let result = sqlx::query_as!(Ticket, "SELECT * FROM tickets")
         .fetch_all(&data.pool)
         .await;
 
@@ -220,8 +215,8 @@ pub async fn get_tickets(data: web::Data<AppState>) -> impl Responder {
     }
 }
 
-pub async fn get_ticket(data: web::Data<AppState>, ticket_id: web::Path<i32>) -> impl Responder {
-    let result = sqlx::query_as!(Item, "SELECT * FROM tickets WHERE id = $1", *ticket_id)
+pub async fn get_ticket(data: web::Data<AppState>, ticket_id: web::Path<Uuid>) -> impl Responder {
+    let result = sqlx::query_as!(Ticket, "SELECT * FROM tickets WHERE id = $1", *ticket_id)
         .fetch_one(&data.pool)
         .await;
 
@@ -234,12 +229,12 @@ pub async fn get_ticket(data: web::Data<AppState>, ticket_id: web::Path<i32>) ->
 // Update
 pub async fn update_ticket(
     data: web::Data<AppState>,
-    ticket_id: web::Path<i32>,
-    ticket: web::Json<CreateItem>,
+    ticket_id: web::Path<Uuid>,
+    ticket: web::Json<CreateTicket>,
 ) -> impl Responder {
     let result = sqlx::query!(
         "UPDATE tickets 
-        SET name = $1, seat_number = $2, price = $3, status = $4
+        SET event_id = $1, seat_number = $2, price = $3, status = $4
         WHERE id = $5 RETURNING id, event_id, seat_number, price, status",
         ticket.event_id,
         ticket.seat_number,
@@ -257,7 +252,10 @@ pub async fn update_ticket(
 }
 
 // Delete
-pub async fn delete_ticket(data: web::Data<AppState>, ticket_id: web::Path<i32>) -> impl Responder {
+pub async fn delete_ticket(
+    data: web::Data<AppState>,
+    ticket_id: web::Path<Uuid>,
+) -> impl Responder {
     let result = sqlx::query!("DELETE FROM tickets WHERE id = $1", *ticket_id)
         .execute(&data.pool)
         .await;
