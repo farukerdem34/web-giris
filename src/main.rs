@@ -8,7 +8,8 @@ use std::env;
 mod handlers;
 mod models;
 mod routes;
-
+const HOST: &str = "127.0.0.1";
+const PORT: &str = "8080";
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
@@ -18,10 +19,9 @@ async fn main() -> std::io::Result<()> {
         .expect("Failed to create pool.");
 
     let app_state = web::Data::new(AppState { pool });
-
+    println!("Starting server at http://{}:{}", HOST, PORT);
     HttpServer::new(move || App::new().app_data(app_state.clone()).configure(config))
-        .bind("127.0.0.1:8080")?
+        .bind(format!("{}:{}", HOST, PORT))?
         .run()
         .await
 }
-
