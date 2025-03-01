@@ -3,14 +3,14 @@ use uuid::Uuid;
 
 // Event struct
 #[derive(Serialize, Deserialize)]
-struct Event {
+pub struct Event {
     pub id: Uuid,
     pub name: String,
     pub date: String,
     pub venue: String,
 }
 
-impl Event {
+pub impl Event {
     fn new(name: String, date: String, venue: String) -> Event {
         Event {
             id: Uuid::new_v4(),
@@ -23,14 +23,14 @@ impl Event {
 
 // Ticket Struct
 #[derive(Serialize, Deserialize)]
-enum TicketStatus {
+pub enum TicketStatus {
     Available,
     Reserved,
     Sold,
 }
 
 #[derive(Serialize, Deserialize)]
-struct Ticket {
+pub struct Ticket {
     pub id: Uuid,
     pub event_id: Uuid,
     pub seat_number: i32,
@@ -38,7 +38,7 @@ struct Ticket {
     pub status: TicketStatus,
 }
 
-impl Ticket {
+pub impl Ticket {
     fn new(event_id: Uuid, seat_number: i32, price: i32, status: TicketStatus) -> Ticket {
         Ticket {
             id: Uuid::new_v4(),
@@ -54,14 +54,14 @@ impl Ticket {
 //
 
 #[derive(Serialize, Deserialize)]
-enum ReservationStatus {
+pub enum ReservationStatus {
     Pending,
     Confirmed,
     Cancelled,
 }
 
 #[derive(Serialize, Deserialize)]
-struct Reservation {
+pub struct Reservation {
     pub id: Uuid,
     pub ticket_id: Uuid,
     pub custmer_name: String,
@@ -69,7 +69,7 @@ struct Reservation {
     pub status: ReservationStatus,
 }
 
-impl Reservation {
+pub impl Reservation {
     fn new(
         ticket_id: Uuid,
         custmer_name: String,
