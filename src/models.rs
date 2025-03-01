@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use uuid::Uuid;
 
 // Event struct
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, FromRow)]
 pub struct Event {
     pub id: Uuid,
     pub name: String,
@@ -10,7 +11,7 @@ pub struct Event {
     pub venue: String,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct CreateEvent {
     pub name: String,
     pub date: String,
@@ -18,7 +19,7 @@ pub struct CreateEvent {
 }
 // Ticket Struct
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, FromRow)]
 pub struct Ticket {
     pub id: Uuid,
     pub event_id: Uuid,
@@ -27,7 +28,7 @@ pub struct Ticket {
     pub status: String,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct CreateTicket {
     pub event_id: Uuid,
     pub seat_number: i32,
@@ -36,7 +37,7 @@ pub struct CreateTicket {
 }
 
 // Reservation Struct
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, FromRow)]
 pub struct Reservation {
     pub id: Uuid,
     pub ticket_id: Uuid,
@@ -45,7 +46,7 @@ pub struct Reservation {
     pub status: String,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct CreateReservation {
     pub ticket_id: Uuid,
     pub customer_name: String,
