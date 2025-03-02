@@ -56,6 +56,21 @@ Weblab Giriş Projesi is a web-based ticket reservation system built with Rust u
 
 The project uses a PostgreSQL database with the following schema:
 
+### Users Table
+
+```sql
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+```
+
 ### Events Table
 
 ```sql
@@ -86,10 +101,11 @@ CREATE TABLE IF NOT EXISTS tickets (
 CREATE TABLE IF NOT EXISTS reservations (
     id UUID PRIMARY KEY,
     ticket_id UUID NOT NULL,
-    customer_name VARCHAR(255) NOT NULL,
+    customer_id UUID,
     reservation_date VARCHAR(255) NOT NULL,
     status INT NOT NULL,
-    FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
+    FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
+    FOREIGN KEY (customer_id) REFERENCES users(id) ON DELETE CASCADE
 );
 ```
 
