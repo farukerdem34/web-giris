@@ -3,10 +3,8 @@ services:
     image: lomarkomar/web-giris-db
     environment:
       POSTGRES_USER: postgres_svc
-      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_PASSWORD: P4ssW0rd123
       POSTGRES_DB: db
-    volumes:
-      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     expose:
@@ -24,7 +22,7 @@ services:
     networks:
       - web-giris
     environment:
-      - DATABASE_URL=postgres://postgres_svc:mysecretpassword@db/db
+      - DATABASE_URL=postgres://postgres_svc:P4ssW0rd123@db/db
     depends_on:
       - db
     restart: always

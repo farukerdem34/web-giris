@@ -3,7 +3,7 @@ services:
     image: postgres:14
     environment:
       POSTGRES_USER: postgres_svc
-      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_PASSWORD: P4ssW0rd123
       POSTGRES_DB: db
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
