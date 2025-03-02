@@ -25,7 +25,7 @@ pub struct Ticket {
     pub event_id: Uuid,
     pub seat_number: i32,
     pub price: i32,
-    pub status: String,
+    pub status: i32,
 }
 
 #[derive(Deserialize)]
@@ -33,17 +33,18 @@ pub struct CreateTicket {
     pub event_id: Uuid,
     pub seat_number: i32,
     pub price: i32,
-    pub status: String,
+    pub status: i32,
 }
 
 // Reservation Struct
+
 #[derive(Serialize, Deserialize, FromRow)]
 pub struct Reservation {
     pub id: Uuid,
     pub ticket_id: Uuid,
     pub customer_name: String,
     pub reservation_date: String,
-    pub status: String,
+    pub status: i32,
 }
 
 #[derive(Deserialize)]
@@ -51,5 +52,5 @@ pub struct CreateReservation {
     pub ticket_id: Uuid,
     pub customer_name: String,
     pub reservation_date: String,
-    pub status: String,
+    pub status: i32,
 }
