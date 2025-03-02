@@ -6,9 +6,11 @@ services:
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_DB: db
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
+    expose:
+      - 5432
     restart: always
     networks:
       - web-giris
@@ -17,6 +19,8 @@ services:
     build: ./core
     ports:
       - "8080:8080"
+    expose:
+      - 8080
     networks:
       - web-giris
     environment:
@@ -24,6 +28,7 @@ services:
     depends_on:
       - db
     restart: always
+    command: run
 
   swagger-ui:
     image: swaggerapi/swagger-ui:latest
@@ -33,7 +38,6 @@ services:
       - ./swagger:/swagger
     environment:
       - SWAGGER_JSON=/swagger/openapi.json
-      - API_URL=http://backend:8080
     depends_on:
       - backend
     networks:

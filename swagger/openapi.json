@@ -1,43 +1,543 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Sample API",
-    "description": "A sample API to demonstrate Swagger UI with Docker Compose",
-    "version": "1.0.0"
+    "title": "Weblab Giriş Projesi API",
+    "description": "API for managing events, tickets, and reservations",
+    "version": "1.0.0",
+    "contact": {
+      "name": "farukerdem34",
+      "url": "https://github.com/farukerdem34/web-giris"
+    },
+    "license": {
+      "name": "MIT"
+    }
   },
   "servers": [
     {
-      "url": "http://localhost:8080",
+      "url": "http://127.0.0.1:8080",
       "description": "Development server"
     }
   ],
+  "tags": [
+    {
+      "name": "reservations",
+      "description": "Reservation management endpoints"
+    },
+    {
+      "name": "events",
+      "description": "Event management endpoints"
+    },
+    {
+      "name": "tickets",
+      "description": "Ticket management endpoints"
+    }
+  ],
   "paths": {
-    "/users": {
+    "/reservations": {
       "get": {
-        "summary": "Returns a list of users",
+        "summary": "Get all reservations",
+        "operationId": "getReservations",
+        "tags": ["reservations"],
         "responses": {
           "200": {
-            "description": "A JSON array of user names",
+            "description": "List of reservations",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer"
-                      },
-                      "name": {
-                        "type": "string"
-                      }
-                    }
+                    "$ref": "#/components/schemas/Reservation"
                   }
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal server error"
           }
         }
+      },
+      "post": {
+        "summary": "Create a new reservation",
+        "operationId": "createReservation",
+        "tags": ["reservations"],
+        "requestBody": {
+          "description": "Reservation to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReservation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Reservation created successfully"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/reservations/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "Reservation ID (UUID)",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Get reservation by ID",
+        "operationId": "getReservation",
+        "tags": ["reservations"],
+        "responses": {
+          "200": {
+            "description": "Reservation details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reservation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Reservation not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a reservation",
+        "operationId": "updateReservation",
+        "tags": ["reservations"],
+        "requestBody": {
+          "description": "Updated reservation data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReservation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reservation updated successfully"
+          },
+          "404": {
+            "description": "Reservation not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a reservation",
+        "operationId": "deleteReservation",
+        "tags": ["reservations"],
+        "responses": {
+          "204": {
+            "description": "Reservation deleted successfully"
+          },
+          "404": {
+            "description": "Reservation not found"
+          }
+        }
+      }
+    },
+    "/events": {
+      "get": {
+        "summary": "Get all events",
+        "operationId": "getEvents",
+        "tags": ["events"],
+        "responses": {
+          "200": {
+            "description": "List of events",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Event"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new event",
+        "operationId": "createEvent",
+        "tags": ["events"],
+        "requestBody": {
+          "description": "Event to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Event created successfully"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/events/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "Event ID (UUID)",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Get event by ID",
+        "operationId": "getEvent",
+        "tags": ["events"],
+        "responses": {
+          "200": {
+            "description": "Event details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an event",
+        "operationId": "updateEvent",
+        "tags": ["events"],
+        "requestBody": {
+          "description": "Updated event data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event updated successfully"
+          },
+          "404": {
+            "description": "Event not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an event",
+        "operationId": "deleteEvent",
+        "tags": ["events"],
+        "responses": {
+          "204": {
+            "description": "Event deleted successfully"
+          },
+          "404": {
+            "description": "Event not found"
+          }
+        }
+      }
+    },
+    "/tickets": {
+      "get": {
+        "summary": "Get all tickets",
+        "operationId": "getTickets",
+        "tags": ["tickets"],
+        "responses": {
+          "200": {
+            "description": "List of tickets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ticket"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new ticket",
+        "operationId": "createTicket",
+        "tags": ["tickets"],
+        "requestBody": {
+          "description": "Ticket to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTicket"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ticket created successfully"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/tickets/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "Ticket ID (UUID)",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Get ticket by ID",
+        "operationId": "getTicket",
+        "tags": ["tickets"],
+        "responses": {
+          "200": {
+            "description": "Ticket details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ticket"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ticket not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a ticket",
+        "operationId": "updateTicket",
+        "tags": ["tickets"],
+        "requestBody": {
+          "description": "Updated ticket data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTicket"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ticket updated successfully"
+          },
+          "404": {
+            "description": "Ticket not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a ticket",
+        "operationId": "deleteTicket",
+        "tags": ["tickets"],
+        "responses": {
+          "204": {
+            "description": "Ticket deleted successfully"
+          },
+          "404": {
+            "description": "Ticket not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Event": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the event"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the event"
+          },
+          "date": {
+            "type": "string",
+            "description": "Date of the event"
+          },
+          "venue": {
+            "type": "string",
+            "description": "Venue where the event is held"
+          }
+        },
+        "required": ["id", "name", "date", "venue"]
+      },
+      "CreateEvent": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the event"
+          },
+          "date": {
+            "type": "string",
+            "description": "Date of the event"
+          },
+          "venue": {
+            "type": "string",
+            "description": "Venue where the event is held"
+          }
+        },
+        "required": ["name", "date", "venue"]
+      },
+      "Ticket": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the ticket"
+          },
+          "event_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Reference to the event"
+          },
+          "seat_number": {
+            "type": "integer",
+            "description": "Seat number for the ticket"
+          },
+          "price": {
+            "type": "integer",
+            "description": "Price of the ticket"
+          },
+          "status": {
+            "type": "integer",
+            "description": "Status of the ticket (0: Available, 1: Reserved, 2: Sold)"
+          }
+        },
+        "required": ["id", "event_id", "seat_number", "price", "status"]
+      },
+      "CreateTicket": {
+        "type": "object",
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Reference to the event"
+          },
+          "seat_number": {
+            "type": "integer",
+            "description": "Seat number for the ticket"
+          },
+          "price": {
+            "type": "integer",
+            "description": "Price of the ticket"
+          },
+          "status": {
+            "type": "integer",
+            "description": "Status of the ticket (0: Available, 1: Reserved, 2: Sold)"
+          }
+        },
+        "required": ["event_id", "seat_number", "price", "status"]
+      },
+      "Reservation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the reservation"
+          },
+          "ticket_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Reference to the ticket"
+          },
+          "customer_name": {
+            "type": "string",
+            "description": "Name of the customer"
+          },
+          "reservation_date": {
+            "type": "string",
+            "description": "Date of reservation"
+          },
+          "status": {
+            "type": "integer",
+            "description": "Status of the reservation (0: Pending, 1: Confirmed, 2: Cancelled)"
+          }
+        },
+        "required": ["id", "ticket_id", "customer_name", "reservation_date", "status"]
+      },
+      "CreateReservation": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Reference to the ticket"
+          },
+          "customer_name": {
+            "type": "string",
+            "description": "Name of the customer"
+          },
+          "reservation_date": {
+            "type": "string",
+            "description": "Date of reservation"
+          },
+          "status": {
+            "type": "integer",
+            "description": "Status of the reservation (0: Pending, 1: Confirmed, 2: Cancelled)"
+          }
+        },
+        "required": ["ticket_id", "customer_name", "reservation_date", "status"]
       }
     }
   }
