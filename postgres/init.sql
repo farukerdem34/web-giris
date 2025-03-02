@@ -35,7 +35,8 @@ CREATE TABLE IF NOT EXISTS reservations (
     reservation_date VARCHAR(255) NOT NULL,
     status INT NOT NULL,
     FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
-    FOREIGN KEY (customer_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (customer_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT unique_ticket_booking UNIQUE (ticket_id)
 );
 
 
