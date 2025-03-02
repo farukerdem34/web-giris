@@ -7,10 +7,6 @@ pub struct AppState {
     pub pool: PgPool,
 }
 
-fn create_uuid() -> Uuid {
-    Uuid::new_v4()
-}
-
 // Create
 pub async fn create_reservation(
     data: web::Data<AppState>,
