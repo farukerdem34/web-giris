@@ -7,13 +7,18 @@ pub struct AppState {
     pub pool: PgPool,
 }
 
+fn create_uuid() -> Uuid {
+    Uuid::new_v4()
+}
+
 // Create
 pub async fn create_reservation(
     data: web::Data<AppState>,
     reservation: web::Json<CreateReservation>,
 ) -> impl Responder {
     let result = sqlx::query!(
-        "INSERT INTO reservations (ticket_id,customer_name,reservation_date,status) VALUES ($1, $2,$3,$4) RETURNING id, ticket_id,customer_name,reservation_date,status",
+        "INSERT INTO reservations (id, ticket_id, customer_name, reservation_date, status) VALUES ($1, $2, $3, $4, $5) RETURNING id, ticket_id, customer_name, reservation_date, status",
+        uuid::Uuid::new_v4(),
         reservation.ticket_id,
         reservation.customer_name,
         reservation.reservation_date,
@@ -103,9 +108,10 @@ pub async fn create_event(
 ) -> impl Responder {
     let result = sqlx::query!(
         "INSERT INTO events 
-        (name, date,venue)
-        VALUES ($1, $2,$3) 
-        RETURNING name, date,venue",
+        (id, name, date, venue)
+        VALUES ($1, $2, $3, $4) 
+        RETURNING id, name, date, venue",
+        uuid::Uuid::new_v4(),
         event.name,
         event.date,
         event.venue
@@ -186,9 +192,10 @@ pub async fn create_ticket(
     ticket: web::Json<CreateTicket>,
 ) -> impl Responder {
     let result = sqlx::query!(
-        "INSERT INTO tickets (event_id, seat_number, price, status) 
-        VALUES ($1, $2,$3,$4) 
+        "INSERT INTO tickets (id, event_id, seat_number, price, status) 
+        VALUES ($1, $2, $3, $4,$5) 
         RETURNING id, event_id, seat_number, price, status",
+        uuid::Uuid::new_v4(),
         ticket.event_id,
         ticket.seat_number,
         ticket.price,
