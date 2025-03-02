@@ -14,35 +14,69 @@ pub async fn create_reservation(
     data: web::Data<AppState>,
     reservation: web::Json<CreateReservation>,
 ) -> impl Responder {
+    // Start a transaction
+    let mut tx = match data.pool.begin().await {
+        Ok(tx) => tx,
+        Err(_) => return HttpResponse::InternalServerError().finish(),
+    };
+
+    // Check if the ticket is already reserved
+    let ticket_check = sqlx::query!(
+        "SELECT id FROM reservations WHERE ticket_id = $1 FOR UPDATE",
+        reservation.ticket_id
+    )
+    .fetch_optional(&mut tx)
+    .await;
+
+    if let Ok(Some(_)) = ticket_check {
+        // The ticket is already reserved
+        return HttpResponse::Conflict().json("This ticket is already booked by another user");
+    }
+
+    // Attempt to create the reservation
     let result = sqlx::query!(
-        "INSERT INTO reservations (id, ticket_id, customer_id, reservation_date, status) VALUES ($1, $2, $3, $4, $5) RETURNING id, ticket_id, customer_id, reservation_date, status",
+        "INSERT INTO reservations (id, ticket_id, customer_id, reservation_date, status) 
+         VALUES ($1, $2, $3, $4, $5) 
+         RETURNING id, ticket_id, customer_id, reservation_date, status",
         uuid::Uuid::new_v4(),
         reservation.ticket_id,
         reservation.customer_id,
         reservation.reservation_date,
         reservation.status
-
     )
-    .fetch_one(&data.pool)
+    .fetch_one(&mut tx)
     .await;
 
     match result {
-        Ok(_record) => HttpResponse::Created(),
-        Err(_) => HttpResponse::InternalServerError(),
+        Ok(_record) => {
+            // Update ticket status to reserved/sold
+            let update_ticket = sqlx::query!(
+                "UPDATE tickets SET status = 1 WHERE id = $1", // Assuming 1 is the status code for "Reserved"
+                reservation.ticket_id
+            )
+            .execute(&mut tx)
+            .await;
+
+            if update_ticket.is_err() {
+                // If updating the ticket fails, rollback the transaction
+                let _ = tx.rollback().await;
+                return HttpResponse::InternalServerError().finish();
+            }
+
+            // Commit the transaction
+            if let Err(_) = tx.commit().await {
+                return HttpResponse::InternalServerError().finish();
+            }
+
+            HttpResponse::Created().finish()
+        }
+        Err(_) => {
+            // If inserting the reservation fails, rollback the transaction
+            let _ = tx.rollback().await;
+            HttpResponse::InternalServerError().finish()
+        }
     }
 }
-
-pub async fn get_reservations(data: web::Data<AppState>) -> impl Responder {
-    let result = sqlx::query_as!(Reservation, "SELECT * FROM reservations")
-        .fetch_all(&data.pool)
-        .await;
-
-    match result {
-        Ok(reservation) => HttpResponse::Ok().json(reservation),
-        Err(_) => HttpResponse::InternalServerError().finish(),
-    }
-}
-
 pub async fn get_reservation(
     data: web::Data<AppState>,
     reservation_id: web::Path<Uuid>,
