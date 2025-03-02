@@ -7,6 +7,8 @@
 ## Quickstart
 
 ```bash
+git clone https://github.com/farukerdem34/web-giris.git&&\
+cd web-giris&&\
 docker compose pull&&\
 docker compose up -d&&\
 docker compose logs -f
