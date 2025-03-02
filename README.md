@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS users (
 ### Events Table
 
 ```sql
-CREATE TABLE events (
+CREATE TABLE IF NOT EXISTS events (
     id UUID PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     date VARCHAR(255) NOT NULL,
@@ -113,7 +113,8 @@ CREATE TABLE IF NOT EXISTS reservations (
     reservation_date VARCHAR(255) NOT NULL,
     status INT NOT NULL,
     FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
-    FOREIGN KEY (customer_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (customer_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT unique_ticket_booking UNIQUE (ticket_id)
 );
 ```
 
