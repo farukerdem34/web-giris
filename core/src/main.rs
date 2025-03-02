@@ -7,7 +7,7 @@ use std::env;
 mod handlers;
 mod models;
 mod routes;
-const HOST: &str = "127.0.0.1";
+const HOST: &str = "0.0.0.0";
 const PORT: &str = "8080";
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
