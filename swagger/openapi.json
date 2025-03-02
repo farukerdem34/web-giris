@@ -9,7 +9,7 @@
       "url": "https://github.com/farukerdem34/web-giris"
     },
     "license": {
-      "name": "MIT"
+      "name": "GNU"
     }
   },
   "servers": [
@@ -393,6 +393,7 @@
         }
       }
     },
+
     "/users": {
       "get": {
         "summary": "Get all users",
@@ -659,7 +660,57 @@
           }
         },
         "required": ["ticket_id", "customer_name", "reservation_date", "status"]
+      },
+      "User":{
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the user"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the user"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email of the user"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password of the user"
+          },
+          "is_active":{
+            "type": "boolean",
+            "description": "Status of the user (true: Active, false: Inactive)"
+          }
+        },
+        "required": ["id", "name", "email", "password"]
+      },
+      "CreateUser":{
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the user"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email of the user"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password of the user"
+          },
+          "is_active":{
+            "type": "boolean",
+            "description": "Status of the user (true: Active, false: Inactive)"
+          }
+        },
+        "required": ["name", "email", "password"]
       }
+
     }
   }
 }
