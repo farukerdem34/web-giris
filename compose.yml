@@ -14,13 +14,16 @@ services:
       - web-giris
 
   backend:
-    image: lomarkomar/web-giris
+    build: .
     ports:
       - "8080:8080"
     networks:
       - web-giris
     environment:
       - DATABASE_URL=postgres://postgres_svc:mysecretpassword@db/db
+    depends_on:
+      - db
+    restart: always
 
 networks:
   web-giris:
