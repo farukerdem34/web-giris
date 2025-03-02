@@ -77,6 +77,19 @@ pub async fn create_reservation(
         }
     }
 }
+
+pub async fn get_reservations(data: web::Data<AppState>) -> impl Responder {
+    let result = sqlx::query_as!(Reservation, "SELECT * FROM reservations")
+        .fetch_all(&data.pool)
+        .await;
+
+    match result {
+        Ok(reservation) => HttpResponse::Ok().json(reservation),
+
+        Err(_) => HttpResponse::InternalServerError().finish(),
+    }
+}
+
 pub async fn get_reservation(
     data: web::Data<AppState>,
     reservation_id: web::Path<Uuid>,
