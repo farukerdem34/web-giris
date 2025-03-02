@@ -42,7 +42,7 @@ pub struct CreateTicket {
 pub struct Reservation {
     pub id: Uuid,
     pub ticket_id: Uuid,
-    pub customer_name: String,
+    pub customer_id: Option<Uuid>,
     pub reservation_date: String,
     pub status: i32,
 }
@@ -50,7 +50,7 @@ pub struct Reservation {
 #[derive(Deserialize)]
 pub struct CreateReservation {
     pub ticket_id: Uuid,
-    pub customer_name: String,
+    pub customer_id: Uuid,
     pub reservation_date: String,
     pub status: i32,
 }

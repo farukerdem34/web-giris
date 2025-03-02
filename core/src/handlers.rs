@@ -15,10 +15,10 @@ pub async fn create_reservation(
     reservation: web::Json<CreateReservation>,
 ) -> impl Responder {
     let result = sqlx::query!(
-        "INSERT INTO reservations (id, ticket_id, customer_name, reservation_date, status) VALUES ($1, $2, $3, $4, $5) RETURNING id, ticket_id, customer_name, reservation_date, status",
+        "INSERT INTO reservations (id, ticket_id, customer_id, reservation_date, status) VALUES ($1, $2, $3, $4, $5) RETURNING id, ticket_id, customer_id, reservation_date, status",
         uuid::Uuid::new_v4(),
         reservation.ticket_id,
-        reservation.customer_name,
+        reservation.customer_id,
         reservation.reservation_date,
         reservation.status
 
@@ -67,10 +67,10 @@ pub async fn update_reservation(
     reservation: web::Json<CreateReservation>,
 ) -> impl Responder {
     let result = sqlx::query!(
-        "UPDATE reservations SET ticket_id = $1, customer_name= $2,reservation_date=$3,status=$4 
-        WHERE id = $5 RETURNING id, ticket_id,customer_name,reservation_date,status",
+        "UPDATE reservations SET ticket_id = $1, customer_id= $2,reservation_date=$3,status=$4 
+        WHERE id = $5 RETURNING id, ticket_id,customer_id,reservation_date,status",
         reservation.ticket_id,
-        reservation.customer_name,
+        reservation.customer_id,
         reservation.reservation_date,
         reservation.status,
         *reservation_id
