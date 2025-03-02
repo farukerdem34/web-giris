@@ -52,7 +52,7 @@ Weblab Giriş Projesi is a web-based ticket reservation system built with Rust u
 - `PUT /reservations/{id}` - Update an existing reservation
 - `DELETE /reservations/{id}` - Delete a reservation
 
-### Reservations
+### Users
 
 - `GET /users` - Get all reservations
 - `GET /users/{id}` - Get a specific reservation by ID
