@@ -14,7 +14,7 @@ services:
       - web-giris
 
   backend:
-    build: .
+    build: ./core
     ports:
       - "8080:8080"
     networks:
