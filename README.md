@@ -4,6 +4,14 @@
 ![Dockerfile](https://img.shields.io/badge/dockerfile-0.6%25-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+## Quickstart
+
+```bash
+docker compose pull&&\
+docker compose up -d&&\
+docker compose logs -f
+```
+
 ## Overview
 
 Weblab Giriş Projesi is a web-based ticket reservation system built with Rust using the Actix-web framework. This application provides REST API endpoints for managing events, tickets, and reservations. The system enables creating, viewing, updating, and deleting events, tickets, and reservations through a well-defined API.
