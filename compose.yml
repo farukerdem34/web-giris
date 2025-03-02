@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres_svc
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: db
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    restart: always
+    networks:
+      - web-giris
+
+  backend:
+    image: lomarkomar/web-giris
+    ports:
+      - "8080:8080"
+    networks:
+      - web-giris
+    environment:
+      - DATABASE_URL=postgres://postgres_svc:mysecretpassword@db/db
+
+networks:
+  web-giris:

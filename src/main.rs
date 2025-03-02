@@ -1,7 +1,6 @@
 use crate::handlers::AppState;
 use crate::routes::config;
 use actix_web::{web, App, HttpServer};
-use dotenv::dotenv;
 use sqlx::PgPool;
 use std::env;
 
@@ -12,7 +11,6 @@ const HOST: &str = "127.0.0.1";
 const PORT: &str = "8080";
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    dotenv().ok();
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let pool = PgPool::connect(&database_url)
         .await
