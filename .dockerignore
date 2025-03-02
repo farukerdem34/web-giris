@@ -1,5 +1,0 @@
-target/
-postgres/
-LICENCE
-Dockerfile
-init.sql

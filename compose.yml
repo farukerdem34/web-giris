@@ -25,5 +25,19 @@ services:
       - db
     restart: always
 
+  swagger-ui:
+    image: swaggerapi/swagger-ui:latest
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./swagger:/swagger
+    environment:
+      - SWAGGER_JSON=/swagger/openapi.json
+      - API_URL=http://backend:8080
+    depends_on:
+      - backend
+    networks:
+      - web-giris
+
 networks:
   web-giris:
