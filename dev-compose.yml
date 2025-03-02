@@ -1,6 +1,6 @@
 services:
   db:
-    image: lomarkomar/web-giris-db
+    image: postgres:14
     environment:
       POSTGRES_USER: postgres_svc
       POSTGRES_PASSWORD: mysecretpassword
@@ -16,7 +16,7 @@ services:
       - web-giris
 
   backend:
-    image: lomarkomar/web-giris-backend
+    build: ./core
     ports:
       - "8080:8080"
     expose:
@@ -31,9 +31,13 @@ services:
     command: run
 
   swagger-ui:
-    image: lomarkomar/web-giris-swagger
+    image: swaggerapi/swagger-ui:latest
     ports:
       - "8081:8080"
+    volumes:
+      - ./swagger:/swagger
+    environment:
+      - SWAGGER_JSON=/swagger/openapi.json
     depends_on:
       - backend
     networks:
