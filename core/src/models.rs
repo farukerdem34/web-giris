@@ -54,3 +54,19 @@ pub struct CreateReservation {
     pub reservation_date: String,
     pub status: i32,
 }
+
+#[derive(Serialize, Deserialize, FromRow)]
+pub struct User {
+    pub id: Uuid,
+    pub username: String,
+    pub email: String,
+    pub is_active: Option<bool>,
+}
+
+#[derive(Serialize, Deserialize, FromRow)]
+pub struct CreateUser {
+    pub username: String,
+    pub email: String,
+    pub password: String,
+    pub is_active: Option<bool>,
+}

@@ -1,5 +1,7 @@
 use crate::models::{CreateEvent, CreateReservation, CreateTicket, Event, Reservation, Ticket};
+use crate::models::{CreateUser, User};
 use actix_web::{web, HttpResponse, Responder};
+use bcrypt::{hash, verify, DEFAULT_COST};
 use sqlx::PgPool;
 use uuid::Uuid;
 #[derive(Clone)]
@@ -267,4 +269,96 @@ pub async fn delete_ticket(
         Ok(_) => HttpResponse::NoContent().finish(),
         Err(_) => HttpResponse::NotFound().finish(),
     }
+}
+
+// Create User
+pub async fn create_user(data: web::Data<AppState>, user: web::Json<CreateUser>) -> impl Responder {
+    let result = sqlx::query!(
+        "INSERT INTO users (id, username,email, password) 
+        VALUES ($1, $2, $3, $4) 
+        RETURNING id, username,email, password, is_active",
+        uuid::Uuid::new_v4(),
+        user.username,
+        user.email,
+        hash_password(&user.password).await
+    )
+    .fetch_one(&data.pool)
+    .await;
+
+    match result {
+        Ok(_record) => HttpResponse::Created(),
+        Err(_) => HttpResponse::InternalServerError(),
+    }
+}
+
+// Read
+pub async fn get_users(data: web::Data<AppState>) -> impl Responder {
+    let result = sqlx::query_as!(User, "SELECT id,username,email,is_active FROM users")
+        .fetch_all(&data.pool)
+        .await;
+
+    match result {
+        Ok(users) => HttpResponse::Ok().json(users),
+        Err(_) => HttpResponse::InternalServerError().finish(),
+    }
+}
+
+pub async fn get_user(data: web::Data<AppState>, user_id: web::Path<Uuid>) -> impl Responder {
+    let result = sqlx::query_as!(
+        User,
+        "SELECT id,username,email,is_active FROM users WHERE id = $1",
+        *user_id
+    )
+    .fetch_one(&data.pool)
+    .await;
+
+    match result {
+        Ok(user) => HttpResponse::Ok().json(user),
+        Err(_) => HttpResponse::NotFound().finish(),
+    }
+}
+
+pub async fn update_user(
+    data: web::Data<AppState>,
+    user_id: web::Path<Uuid>,
+    user: web::Json<CreateUser>,
+) -> impl Responder {
+    let result = sqlx::query!(
+        "UPDATE users 
+        SET  username = $1, email = $2, is_active = $3
+        WHERE id = $4 RETURNING id, username, email, is_active",
+        user.username,
+        user.email,
+        user.is_active,
+        *user_id
+    )
+    .fetch_one(&data.pool)
+    .await;
+
+    match result {
+        Ok(_updated_user) => HttpResponse::Ok(),
+        Err(_) => HttpResponse::NotFound(),
+    }
+}
+
+// Delete
+pub async fn delete_user(data: web::Data<AppState>, user_id: web::Path<Uuid>) -> impl Responder {
+    let result = sqlx::query!("DELETE FROM users WHERE id = $1", *user_id)
+        .execute(&data.pool)
+        .await;
+
+    match result {
+        Ok(_) => HttpResponse::NoContent().finish(),
+        Err(_) => HttpResponse::NotFound().finish(),
+    }
+}
+
+async fn hash_password(plain_password: &String) -> String {
+    let hashed_password = hash(plain_password, DEFAULT_COST).expect("Failed to hash password");
+    hashed_password
+}
+
+async fn verify_password(plain_password: &String, hashed_password: &String) -> bool {
+    let is_valid = verify(plain_password, hashed_password).expect("Failed to verify password");
+    is_valid
 }

@@ -13,3 +13,4 @@ tokio = { version = "1", features = ["full"] }
 sqlx = { version = "0.6", features = ["runtime-tokio-rustls", "postgres", "macros","uuid"] }
 dotenv = "0.15"
 uuid = { version = "1", features = ["v4","serde"] }
+bcrypt = "0.17.0"

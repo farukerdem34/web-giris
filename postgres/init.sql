@@ -26,6 +26,17 @@ CREATE TABLE IF NOT EXISTS reservations (
     FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
 );
 
+-- Create Users table
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
 -- Example Inserts for testing
 
 -- Insert sample events
@@ -44,5 +55,8 @@ INSERT INTO reservations (id, ticket_id, customer_name, reservation_date, status
 ('4b07a70c-c0b6-45cf-bb7f-1048a935d1b0', '3ffbfe47-4e5b-45fa-9c1f-8f350be02bdb', 'Alice Johnson', '2025-05-10', 0),
 ('3b6e19b4-1e3f-4ab1-8d9e-b527c9982e24', '6ed22c79-d2f5-4d3b-8fa7-12c1bb02062b', 'Bob Smith', '2025-06-01', 1),
 ('cf19f679-cf32-4707-98de-582da1a567c3', '7a1b0adf-4583-4a0a-b8ca-585902495a01', 'Charlie Lee', '2025-03-10', 2);
+
+INSERT INTO users (id,username, email, password) 
+VALUES ('b298e81a-057a-44bf-859b-d57920d451ae','test_user', 'test@example.com', 'hashed_password_here');
 
 
