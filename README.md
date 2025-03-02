@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS reservations (
 
 Create a `.env` file in the root directory with the following variables:
 
-```
+```env
 DATABASE_URL=postgres://postgres:password@postgres:5432/ticketing
 ```
 
